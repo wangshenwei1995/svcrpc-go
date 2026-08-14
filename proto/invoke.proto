@@ -1,0 +1,33 @@
+// invoke.proto — 微服务通用调用协议（svcrpc 插件核心契约）。
+//
+// 每个接入本插件的微服务都会暴露 Invoker 服务：
+// 调用方通过固定的 Call 方法（service + method + payload）完成跨服务调用，
+// 无需为每个服务单独编写 proto / 生成客户端代码。
+syntax = "proto3";
+
+package invoke.v1;
+
+option go_package = "svcrpc/gen/invoke;invoke";
+
+// Invoker 是每个微服务必须实现的通用调用入口。
+service Invoker {
+  // Call 通用 unary 调用：method 为目标方法名，payload 为请求体（建议 JSON）。
+  // 错误通过 gRPC status 透传（NotFound / InvalidArgument / Unavailable 等）。
+  rpc Call(CallRequest) returns (CallResponse);
+}
+
+message CallRequest {
+  // 目标方法名，例如 "CreateOrder"。
+  string method = 1;
+  // 请求体（bytes 二进制安全，建议 JSON 编码）。
+  bytes payload = 2;
+  // 透传元数据（trace id、来源服务等），响应中原样带回。
+  map<string, string> metadata = 3;
+}
+
+message CallResponse {
+  // 响应体（bytes 二进制安全，建议 JSON 编码）。
+  bytes payload = 1;
+  // 服务端返回的元数据。
+  map<string, string> metadata = 2;
+}
