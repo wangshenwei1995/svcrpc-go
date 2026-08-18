@@ -18,8 +18,8 @@ import (
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 
-	pb "svcrpc/gen/invoke"
-	"svcrpc/registry"
+	pb "github.com/wangshenwei1995/svcrpc-go/gen/invoke"
+	"github.com/wangshenwei1995/svcrpc-go/registry"
 )
 
 // Handler 处理一个方法的通用调用。payload 为请求体（建议 JSON），返回值同理。

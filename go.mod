@@ -1,4 +1,4 @@
-module svcrpc
+module github.com/wangshenwei1995/svcrpc-go
 
 go 1.26.1
 

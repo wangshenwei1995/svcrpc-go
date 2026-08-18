@@ -16,7 +16,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"svcrpc/host"
+	"github.com/wangshenwei1995/svcrpc-go/host"
 )
 
 type emailReq struct {

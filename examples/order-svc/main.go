@@ -21,8 +21,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"svcrpc/client"
-	"svcrpc/host"
+	"github.com/wangshenwei1995/svcrpc-go/client"
+	"github.com/wangshenwei1995/svcrpc-go/host"
 )
 
 type createOrderReq struct {

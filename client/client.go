@@ -16,8 +16,9 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 
-	pb "svcrpc/gen/invoke"
-	"svcrpc/registry"
+	pb "github.com/wangshenwei1995/svcrpc-go/gen/invoke"
+
+	"github.com/wangshenwei1995/svcrpc-go/registry"
 )
 
 // Config 是调用方配置。

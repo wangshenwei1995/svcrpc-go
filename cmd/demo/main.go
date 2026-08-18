@@ -13,7 +13,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc/status"
 
-	"svcrpc/client"
+	"github.com/wangshenwei1995/svcrpc-go/client"
 )
 
 func main() {
