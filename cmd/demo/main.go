@@ -20,7 +20,7 @@ func main() {
 	log := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	slog.SetDefault(log)
 
-	rdb := redis.NewClient(&redis.Options{Addr: getenv("REDIS_ADDR", "127.0.0.1:6379")})
+	rdb := redis.NewClient(&redis.Options{Addr: getenv("REDIS_ADDR", "192.168.1.20:45157")})
 	defer rdb.Close()
 
 	// 一行创建调用方插件

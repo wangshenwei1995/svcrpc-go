@@ -73,6 +73,10 @@ func NewHost(rdb *redis.Client, cfg Config) (*Host, error) {
 	if cfg.InstanceTTL <= 0 {
 		cfg.InstanceTTL = 10 * time.Second
 	}
+	if cfg.InstanceTTL <= cfg.HeartbeatInterval {
+		return nil, fmt.Errorf("host: InstanceTTL (%s) must be greater than HeartbeatInterval (%s)",
+			cfg.InstanceTTL, cfg.HeartbeatInterval)
+	}
 	if cfg.Logger == nil {
 		cfg.Logger = slog.Default()
 	}

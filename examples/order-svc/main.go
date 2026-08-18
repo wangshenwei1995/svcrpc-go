@@ -42,7 +42,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	rdb := redis.NewClient(&redis.Options{Addr: getenv("REDIS_ADDR", "127.0.0.1:6379")})
+	rdb := redis.NewClient(&redis.Options{Addr: getenv("REDIS_ADDR", "192.168.1.20:45157")})
 	defer rdb.Close()
 	// 调用方插件：用于跨服务调用 notify
 	caller := client.New(rdb, client.Config{})

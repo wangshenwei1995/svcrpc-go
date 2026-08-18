@@ -67,9 +67,17 @@ func (r *Registry) Register(ctx context.Context, inst Instance) error {
 	return nil
 }
 
-// Heartbeat 续约实例有效期。
+// Heartbeat 续约实例有效期。若实例详情已不存在（过期、被清理或 Redis 数据丢失），
+// 返回错误；调用方（host）应据此重新注册，避免"假活"（服务在册但调用方永远找不到）。
 func (r *Registry) Heartbeat(ctx context.Context, id string) error {
-	return r.rdb.Expire(ctx, fmt.Sprintf(keyInst, id), r.ttl).Err()
+	ok, err := r.rdb.Expire(ctx, fmt.Sprintf(keyInst, id), r.ttl).Result()
+	if err != nil {
+		return fmt.Errorf("registry: heartbeat %s: %w", id, err)
+	}
+	if !ok {
+		return fmt.Errorf("registry: heartbeat %s: instance expired, re-register required", id)
+	}
+	return nil
 }
 
 // Deregister 注销实例（优雅停机时调用）。
@@ -108,6 +116,27 @@ func (r *Registry) Discover(ctx context.Context, service string) ([]Instance, er
 			live = append(live, id)
 		}
 	}
+
+	// 顺带清理僵尸 ID：集合里还有、但详情已过期的成员（崩溃/强杀残留），
+	// 从集合 best-effort 移除，防止 svcrpc:svc:* 无限膨胀。清理失败不影响发现结果。
+	if len(live) != len(ids) {
+		liveSet := make(map[string]struct{}, len(live))
+		for _, id := range live {
+			liveSet[id] = struct{}{}
+		}
+		dead := make([]interface{}, 0, len(ids)-len(live))
+		for _, id := range ids {
+			if _, ok := liveSet[id]; !ok {
+				dead = append(dead, id)
+			}
+		}
+		pipe := r.rdb.Pipeline()
+		pipe.SRem(ctx, fmt.Sprintf(keyService, service), dead...)
+		if _, err := pipe.Exec(ctx); err != nil {
+			return nil, fmt.Errorf("registry: cleanup zombies of %q: %w", service, err)
+		}
+	}
+
 	if len(live) == 0 {
 		return nil, nil
 	}
